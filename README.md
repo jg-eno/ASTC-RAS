@@ -27,15 +27,45 @@ The pipeline operates in two major phases:
 ## Repository Layout
 
 ```text
-VideoRAG/
-├── VideoRAG_algorithm/               # Core algorithm library (graph ops, traversal schema, LLM logic)
-├── videos/                           # Target directory for incoming .mp4 video files
-├── construct_graph.py                # Command to process clips and construct the Knowledge Graph
-├── ask_activity.py                   # Command to execute Activity-Aware traversal + text summary
-├── ask_graph.py                      # Auxiliary testing graph query engine
-├── MiniCPM-V-2_6-int4/               # Local repository Vision Language Caption Model
-└── faster-distil-whisper-large-v3/   # Local repository Audio ASR Transcribe Model
+ASTC-RAS/
+├── README.md                         # This document
+├── setup.sh                          # pip dependency install script (torch, faster-whisper, etc.)
+├── .gitignore                        # Ignores weights, .env, and Python bytecode
+├── LICENSE                           # Project license
+│
+├── construct_graph.py                # Phase 1: ingest videos -> transcript/captions -> build Knowledge Graph
+├── ask_activity.py                   # Phase 2: Activity-Aware subgraph traversal + hierarchical summary
+├── ask_graph.py                      # Auxiliary / testing direct graph query engine
+│
+├── videos/                           # Drop target .mp4 clips here (indexed by construct_graph.py)
+│   ├── Amritsar Woman Stops Robbers.mp4
+│   └── Human Activity Recognition I3D Demo 720P.mp4
+│
+└── VideoRAG_algorithm/               # Core algorithm library (forked VideoRAG, trimmed to essentials)
+    └── videorag/
+        ├── __init__.py               # Exposes VideoRAG, QueryParam
+        ├── videorag.py               # Main pipeline: insert_video, query, generate_activity_summary
+        ├── activity_summarization.py # Activity clustering + BFS subgraph traversal + summarization
+        ├── _op.py                    # Graph/entity extraction + retrieval operator
+        ├── _splitter.py              # Text chunk splitting
+        ├── _llm.py                   # LLM + embedding configs (Gemini, OpenAI, Azure, Ollama)
+        ├── base.py                   # Storage base interfaces
+        ├── prompt.py                 # LLM prompts
+        ├── _utils.py                 # Shared helpers / hashing
+        ├── _videoutil/               # Video ingestion utilities
+        │   ├── split.py              # Video -> clip splitting
+        │   ├── feature.py            # Visual feature extraction
+        │   ├── caption.py            # VLM captioning (MiniCPM-V)
+        │   └── asr.py                # Audio transcription (faster-whisper)
+        └── _storage/                 # Pluggable storage backends
+            ├── kv_json.py            # JSON key-value store
+            ├── gdb_networkx.py       # In-memory NetworkX graph
+            ├── gdb_neo4j.py          # Optional Neo4j graph
+            ├── vdb_hnswlib.py        # HNSW vector store
+            └── vdb_nanovectordb.py   # NanoVectorDB vector store (+ video segment store)
 ```
+
+> Runtime note: the caption (MiniCPM-V-2_6-int4) and ASR (faster-distil-whisper-large-v3) model weights are downloaded locally and kept out of git via `.gitignore` (see the "Large local model weights" section). The `videorag-workdir*` directories generated at runtime are also gitignored.
 
 ## Quick Start Guide
 
