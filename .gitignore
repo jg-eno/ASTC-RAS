@@ -24,3 +24,5 @@ MiniCPM-V-2_6-int4/
 #   git rm -r --cached faster-distil-whisper-large-v3 MiniCPM-V-2_6-int4
 #   git rm --cached path/to/each/file.safetensors
 *.env
+.hermes/
+PHASE2_3_PLAN.md

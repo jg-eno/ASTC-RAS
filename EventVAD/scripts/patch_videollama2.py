@@ -43,6 +43,17 @@ def main():
     if old_quant in source:
         source = source.replace(old_quant, new_quant, 1)
         loader.write_text(source)
+
+    projector = root / "videollama2" / "model" / "projector.py"
+    source = projector.read_text()
+    old_cache_import = "from transformers import TRANSFORMERS_CACHE"
+    new_cache_import = "from huggingface_hub.constants import HF_HUB_CACHE"
+    if old_cache_import in source:
+        source = source.replace(old_cache_import, new_cache_import, 1)
+        source = source.replace("cache_dir = TRANSFORMERS_CACHE", "cache_dir = HF_HUB_CACHE", 1)
+        projector.write_text(source)
+    elif new_cache_import not in source:
+        raise SystemExit(f"Expected upstream cache import not found in {projector}")
     print(f"Patched SigLIP/CLIP vision attention to eager: {encoder}")
 
 
