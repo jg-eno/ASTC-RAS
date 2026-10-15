@@ -1,0 +1,47 @@
+result_label: paper_reconstruction
+paths:
+  persistent_root: /data/eventvad
+  scratch: /data/eventvad/scratch
+  model: /data/eventvad/models/VideoLLaMA2.1-7B-16F
+  raft_checkpoint: /tmp/RAFT/models/raft-things.pth
+resources:
+  preflight_stage: segmentation
+  free_gib: {segmentation: 12, scoring: 32}
+  timeout_seconds: 3600
+feature:
+  backend: clip_raft
+  clip_model: openai/clip-vit-base-patch16
+  clip_batch_size: 32
+  clip_weight: 0.75
+  flow_weight: 0.25
+  raft_iterations: 20
+  raft_dtype: fp32
+  flow_direction: previous_to_current
+  projection_seed: 42
+  max_resolution: [1280, 720]
+graph:
+  topology: paper_reconstruction_v1_blockwise
+  block_size: 200
+  execution_tile_size: 200
+  clip_weight: 0.75
+  time_decay: 0.6
+  qk_dim: 64
+  iterations: 1
+  projection_seed: 42
+boundary:
+  mode: paper_reconstruction
+  smooth_seconds: 2.0
+  mad_multiplier: 3.0
+  min_gap_seconds: 2.0
+scoring:
+  model: DAMO-NLP-SG/VideoLLaMA2.1-7B-16F
+  dtype: fp16
+  quantization: none
+  frame_count: 16
+  max_new_tokens: 256
+  prompt: prompts/paper_reconstruction_v1.txt
+  do_sample: false
+  num_beams: 1
+revisions:
+  eventvad: 25cacd88a82af389776d2b397239f39961ac2d27
+  videollama2_candidate: c0bb03abf6b8a6b9a8dccac006fb4db5d4d9e414

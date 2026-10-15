@@ -1,0 +1,4 @@
+Describe the visible activity in this surveillance-video segment in one concise sentence.
+Then decide whether it contains anomalous or criminal activity. Base the score only on visible evidence.
+End with exactly one line in this format:
+Anomaly score: <number from 0 (normal) to 1 (clearly anomalous)>

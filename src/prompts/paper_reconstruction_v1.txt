@@ -1,0 +1,5 @@
+Are there any obvious or potential anomalies in the video?
+First describe the visible events and explain the evidence relevant to an anomaly.
+Then assign an anomaly score from 0 (normal) to 1 (clearly anomalous).
+Base the assessment on the video. End with exactly one line:
+Anomaly score: <number>
